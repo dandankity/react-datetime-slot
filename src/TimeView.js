@@ -12,7 +12,7 @@ var DateTimePickerTime = onClickOutside(React.createClass({
 	},
 
 	calculateState: function (props) {
-		var date = props.selectedDate || props.viewDate,
+		var date = props.start? props.selectedStartDate : props.selectedEndDate,
 			format = props.timeFormat,
 			counters = []
 			;
@@ -131,9 +131,11 @@ var DateTimePickerTime = onClickOutside(React.createClass({
 				step: 1
 			}
 		};
-		['hours', 'minutes', 'seconds', 'milliseconds'].forEach(function (type) {
-			assign(me.timeConstraints[type], props.timeConstraints[type]);
-		});
+		if ( props.timeConstraints && Object.keys(props.timeConstraints).length) {
+      ['hours', 'minutes', 'seconds', 'milliseconds'].forEach(function (type) {
+        assign(me.timeConstraints[type], props.timeConstraints[type]);
+      });
+    }
 	},
 
 	componentWillMount: function () {
@@ -158,12 +160,12 @@ var DateTimePickerTime = onClickOutside(React.createClass({
 		if (!this.props.dateFormat)
 			return null;
 
-		var date = this.props.selectedDate || this.props.viewDate;
+		var date = this.props.start? this.props.selectedStartDate : this.props.selectedEndDate;
 		return DOM.thead({ key: 'h' }, DOM.tr({},
 			DOM.th({
 				className: 'rdtSwitch',
 				colSpan: 4,
-				onClick: this.props.showView('days')
+				onClick: this.props.showView('days', this.props.start)
 			}, date.format(this.props.dateFormat))
 		));
 	},
@@ -186,7 +188,7 @@ var DateTimePickerTime = onClickOutside(React.createClass({
 			me.mouseUpListener = function () {
 				clearTimeout(me.timer);
 				clearInterval(me.increaseTimer);
-				me.props.setTime(type, me.state[type]);
+				me.props.setTime(type, me.state[type], me.props.start);
 				document.body.removeEventListener('mouseup', me.mouseUpListener);
 			};
 

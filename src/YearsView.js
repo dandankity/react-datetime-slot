@@ -7,13 +7,13 @@ var React = require('react'),
 var DOM = React.DOM;
 var DateTimePickerYears = onClickOutside( React.createClass({
 	render: function() {
-		var year = parseInt( this.props.viewDate.year() / 10, 10 ) * 10;
-
+	  var viewDate = this.props.start? this.props.viewStartDate : this.props.viewEndDate
+		var year = parseInt( viewDate.year() / 10, 10 ) * 10;
 		return DOM.div({ className: 'rdtYears' }, [
 			DOM.table({ key: 'a' }, DOM.thead({}, DOM.tr({}, [
-				DOM.th({ key: 'prev', className: 'rdtPrev' }, DOM.span({ onClick: this.props.subtractTime( 10, 'years' )}, '‹' )),
+				DOM.th({ key: 'prev', className: 'rdtPrev' }, DOM.span({ onClick: this.props.subtractTime( 10, 'years', this.props.start )}, '‹' )),
 				DOM.th({ key: 'year', className: 'rdtSwitch', onClick: this.props.showView( 'years' ), colSpan: 2 }, year + '-' + ( year + 9 ) ),
-				DOM.th({ key: 'next', className: 'rdtNext' }, DOM.span({ onClick: this.props.addTime( 10, 'years' )}, '›' ))
+				DOM.th({ key: 'next', className: 'rdtNext' }, DOM.span({ onClick: this.props.addTime( 10, 'years', this.props.start )}, '›' ))
 				]))),
 			DOM.table({ key: 'years' }, DOM.tbody( {}, this.renderYears( year )))
 		]);
@@ -24,7 +24,8 @@ var DateTimePickerYears = onClickOutside( React.createClass({
 			i = -1,
 			rows = [],
 			renderer = this.props.renderYear || this.renderYear,
-			selectedDate = this.props.selectedDate,
+			selectedDate = this.props.start? this.props.selectedStartDate : this.props.selectedEndDate,
+			viewDate = this.props.start? this.props.viewStartDate : this.props.viewEndDate,
 			isValid = this.props.isValidDate || this.alwaysValidDate,
 			classes, props, currentYear, isDisabled, noOfDaysInYear, daysInYear, validDay,
 			// Month and date are irrelevant here because
@@ -36,7 +37,7 @@ var DateTimePickerYears = onClickOutside( React.createClass({
 		year--;
 		while (i < 11) {
 			classes = 'rdtYear';
-			currentYear = this.props.viewDate.clone().set(
+			currentYear = viewDate.clone().set(
 				{ year: year, month: irrelevantMonth, date: irrelevantDate } );
 
 			// Not sure what 'rdtOld' is for, commenting out for now as it's not working properly
@@ -68,8 +69,8 @@ var DateTimePickerYears = onClickOutside( React.createClass({
 			};
 
 			if ( !isDisabled )
-				props.onClick = ( this.props.updateOn === 'years' ?
-					this.updateSelectedYear : this.props.setDate('year') );
+				props.onClick = ( this.props.viewMode === 'years' ?
+					this.updateSelectedYear : this.props.setDate('year', this.props.start) );
 
 			years.push( renderer( props, year, selectedDate && selectedDate.clone() ));
 
@@ -86,7 +87,12 @@ var DateTimePickerYears = onClickOutside( React.createClass({
 	},
 
 	updateSelectedYear: function( event ) {
-		this.props.updateSelectedDate( event );
+	  if (this.props.start) {
+      this.props.updateSelectedDate( event, 'start' );
+    } else {
+      this.props.updateSelectedDate( event, 'end' );
+    }
+
 	},
 
 	renderYear: function( props, year ) {

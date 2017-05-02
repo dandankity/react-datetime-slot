@@ -2,12 +2,116 @@
  * https://github.com/YouCanBookMe/react-datetime
  */
 
+.time-box {
+  padding: 12px;
+  display: none;
+  position: absolute;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.32);
+  border: solid 1px #979797;
+  background: #ffffff;
+}
+.time-slot {
+  width: 510px;
+}
+
+.right-time-container {
+  display: inline-block !important;
+}
+
+.left-time-container {
+  display: inline-block !important;
+}
+.start-time {
+  position: relative;
+  border: solid 1px #979797 !important;
+  width: 250px !important;
+  margin-right: 9px;
+}
+
+.end-time {
+  position: relative;
+  width: 250px !important;
+  border: solid 1px #979797 !important;
+}
+
+.cancel-button {
+  float: right;
+  width: 110px;
+  padding: 8px 0 8px 14px;
+  margin-right: 15px;
+  border-radius: 53px;
+  background: url(../img/cancel.png) no-repeat 3% center;
+  background-color: #e3e6e7;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  color: #4d5764;
+  margin-top: 10px
+}
+
+.search-button {
+  float: left;
+  width: 110px;
+  padding: 8px 0 8px 14px;
+  margin-left: 5px;
+  border-radius: 53px;
+  background: url(../img/search.png) no-repeat 3% center;
+  background-color: #6bb72f;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
+  margin-top: 10px
+}
+
+.select-item {
+  border-radius: 2px;
+  background-color: #f0f4f6;
+  border: solid 1px #d5dce1;
+  width: 202px;
+  height: 30px;
+  margin-bottom: 11px;
+}
+
+.item-selected {
+  background: #fff;
+  color: #45c8dc !important;
+  border-radius: 2px;
+  border-left: solid 1px #d5dce1;
+  border-right: solid 1px #d5dce1;
+}
+
+.item {
+  width: 50px;
+  opacity: 0.7;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  color: #4d5764;
+  vertical-align: middle;
+  line-height: 30px;
+  height: 30px;
+  display: inline-block;
+  cursor: pointer;
+
+}
+.disable-click {
+  pointer-events: none;
+}
+
+.rdtOpen {
+  display: block;
+}
+
 .rdt {
   position: relative;
 }
 .rdtPicker {
   display: none;
-  position: absolute;
   width: 100%;
   padding: 4px;
   margin-top: 1px;

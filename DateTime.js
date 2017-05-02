@@ -26,7 +26,8 @@ var Datetime = React.createClass({
 		open: TYPES.bool,
 		strictParsing: TYPES.bool,
 		closeOnSelect: TYPES.bool,
-		closeOnTab: TYPES.bool
+		closeOnTab: TYPES.bool,
+    searchByTime: TYPES.func
 	},
 
 	getDefaultProps: function() {
@@ -46,7 +47,7 @@ var Datetime = React.createClass({
 			closeOnSelect: false,
 			closeOnTab: true,
 			utc: false,
-			viewMode: 'days'
+			viewMode: 'months'
 		};
 	},
 
@@ -56,57 +57,51 @@ var Datetime = React.createClass({
 		if ( state.open === undefined )
 			state.open = !this.props.input;
 
-		state.currentView = this.props.dateFormat ? (this.props.viewMode || state.updateOn || 'days') : 'time';
+		state.currentStartView = this.props.dateFormat ? (this.props.viewMode || state.updateOn || 'days') : 'time';
+		state.currentEndView = state.currentStartView;
+		state.viewMode = this.props.viewMode;
 
 		return state;
 	},
 
 	getStateFromProps: function( props ) {
-		var formats = this.getFormats( props ),
-			date = props.value || props.defaultValue,
-			selectedDate, viewDate, updateOn, inputValue
+		var format = this.getFormats( props )[props.viewMode],
+			startDate = props.startTime, endDate = props.endTime,
+			selectedStartDate, selectedEndDate, viewStartDate, viewEndDate, updateOn, inputValue
 		;
 
-		if ( date && typeof date === 'string' )
-			selectedDate = this.localMoment( date, formats.datetime );
-		else if ( date )
-			selectedDate = this.localMoment( date );
+    selectedStartDate = this.localMoment( startDate, format );
+    selectedEndDate = this.localMoment( endDate, format );
+    viewStartDate = selectedStartDate.clone().startOf('month');
+    viewEndDate = selectedEndDate.clone().startOf('month');
 
-		if ( selectedDate && !selectedDate.isValid() )
-			selectedDate = null;
+		updateOn = this.getUpdateOn(format);
 
-		viewDate = selectedDate ?
-			selectedDate.clone().startOf('month') :
-			this.localMoment().startOf('month')
-		;
-
-		updateOn = this.getUpdateOn(formats);
-
-		if ( selectedDate )
-			inputValue = selectedDate.format(formats.datetime);
-		else if ( date.isValid && !date.isValid() )
-			inputValue = '';
+		if ( selectedStartDate && selectedEndDate )
+			inputValue = `${selectedStartDate.format(format)} - ${selectedEndDate.format(format)}`;
 		else
-			inputValue = date || '';
+			inputValue = '';
 
 		return {
 			updateOn: updateOn,
-			inputFormat: formats.datetime,
-			viewDate: viewDate,
-			selectedDate: selectedDate,
+      inputFormat: format,
+      viewStartDate: viewStartDate,
+      viewEndDate: viewEndDate,
+			selectedStartDate: selectedStartDate,
+      selectedEndDate: selectedEndDate,
 			inputValue: inputValue,
 			open: props.open
 		};
 	},
 
 	getUpdateOn: function( formats ) {
-		if ( formats.date.match(/[lLD]/) ) {
+		if ( formats.match('D') ) {
 			return 'days';
 		}
-		else if ( formats.date.indexOf('M') !== -1 ) {
+		else if ( formats.indexOf('MM/YY') !== -1 ) {
 			return 'months';
 		}
-		else if ( formats.date.indexOf('Y') !== -1 ) {
+		else if ( formats.indexOf('YYYY') !== -1 ) {
 			return 'years';
 		}
 
@@ -115,27 +110,11 @@ var Datetime = React.createClass({
 
 	getFormats: function( props ) {
 		var formats = {
-				date: props.dateFormat || '',
-				time: props.timeFormat || ''
-			},
-			locale = this.localMoment( props.date, null, props ).localeData()
-		;
-
-		if ( formats.date === true ) {
-			formats.date = locale.longDateFormat('L');
-		}
-		else if ( this.getUpdateOn(formats) !== 'days' ) {
-			formats.time = '';
-		}
-
-		if ( formats.time === true ) {
-			formats.time = locale.longDateFormat('LT');
-		}
-
-		formats.datetime = formats.date && formats.time ?
-			formats.date + ' ' + formats.time :
-			formats.date || formats.time
-		;
+		    years: 'YYYY',
+        months: 'MM/YY HH:00:00',
+        days: 'DD/MM/YY HH:00:00',
+				time: props.dateFormat + ' ' + props.timeFormat
+			};
 
 		return formats;
 	},
@@ -167,10 +146,10 @@ var Datetime = React.createClass({
 				var updatedViewDate = this.state.viewDate.clone().locale( nextProps.locale );
 				updatedState.viewDate = updatedViewDate;
 			}
-			if ( this.state.selectedDate ) {
-				var updatedSelectedDate = this.state.selectedDate.clone().locale( nextProps.locale );
-				updatedState.selectedDate = updatedSelectedDate;
-				updatedState.inputValue = updatedSelectedDate.format( formats.datetime );
+			if ( this.state.selectedStartDate ) {
+				var updatedSelectedStartDate = this.state.selectedStartDate.clone().locale( nextProps.locale );
+				updatedState.updatedSelectedStartDate = updatedSelectedStartDate;
+				updatedState.inputValue = updatedSelectedStartDate.format( formats.datetime );
 			}
 		}
 
@@ -178,16 +157,16 @@ var Datetime = React.createClass({
 			if ( nextProps.utc ) {
 				if ( this.state.viewDate )
 					updatedState.viewDate = this.state.viewDate.clone().utc();
-				if ( this.state.selectedDate ) {
-					updatedState.selectedDate = this.state.selectedDate.clone().utc();
-					updatedState.inputValue = updatedState.selectedDate.format( formats.datetime );
+				if ( this.state.selectedStartDate ) {
+					updatedState.selectedStartDate = this.state.selectedStartDate.clone().utc();
+					updatedState.inputValue = updatedState.selectedStartDate.format( formats.datetime );
 				}
 			} else {
 				if ( this.state.viewDate )
 					updatedState.viewDate = this.state.viewDate.clone().local();
-				if ( this.state.selectedDate ) {
-					updatedState.selectedDate = this.state.selectedDate.clone().local();
-					updatedState.inputValue = updatedState.selectedDate.format(formats.datetime);
+				if ( this.state.selectedStartDate ) {
+					updatedState.selectedStartDate = this.state.selectedStartDate.clone().local();
+					updatedState.inputValue = updatedState.selectedStartDate.format(formats.datetime);
 				}
 			}
 		}
@@ -202,7 +181,7 @@ var Datetime = React.createClass({
 			;
 
 		if ( localMoment.isValid() && !this.props.value ) {
-			update.selectedDate = localMoment;
+			update.selectedStartDate = localMoment;
 			update.viewDate = localMoment.clone().startOf('month');
 
 			return this.setState( update, function() {
@@ -217,14 +196,18 @@ var Datetime = React.createClass({
 		}
 	},
 
-	showView: function( view ) {
+	showView: function( view, startorEnd ) {
 		var me = this;
 		return function() {
-			me.setState({ currentView: view });
+		  if (startorEnd) {
+        me.setState({ currentStartView: view });
+      } else {
+        me.setState({ currentEndView: view });
+      }
 		};
 	},
 
-	setDate: function( type ) {
+	setDate: function( type, startOrEnd ) {
 		var me = this,
 			nextViews = {
 				month: 'days',
@@ -232,29 +215,39 @@ var Datetime = React.createClass({
 			}
 		;
 		return function( e ) {
-			me.setState({
-				viewDate: me.state.viewDate.clone()[ type ]( parseInt(e.target.getAttribute('data-value'), 10) ).startOf( type ),
-				currentView: nextViews[ type ]
-			});
+		  if (startOrEnd) {
+        me.setState({
+          viewStartDate: me.state.viewStartDate.clone()[ type ]( parseInt(e.target.getAttribute('data-value'), 10) ).startOf( type ),
+          currentStartView: nextViews[ type ]
+        });
+      } else {
+        me.setState({
+          viewEndDate: me.state.viewEndDate.clone()[ type ]( parseInt(e.target.getAttribute('data-value'), 10) ).startOf( type ),
+          currentEndView: nextViews[ type ]
+        });
+      }
+
 		};
 	},
 
-	addTime: function( amount, type, toSelected ) {
-		return this.updateTime( 'add', amount, type, toSelected );
+	addTime: function( amount, type, startOrEnd, toSelected ) {
+		return this.updateTime( 'add', amount, type, startOrEnd, toSelected );
 	},
 
-	subtractTime: function( amount, type, toSelected ) {
-		return this.updateTime( 'subtract', amount, type, toSelected );
+	subtractTime: function( amount, type, startOrEnd, toSelected ) {
+		return this.updateTime( 'subtract', amount, type, startOrEnd,  toSelected );
 	},
 
-	updateTime: function( op, amount, type, toSelected ) {
+	updateTime: function( op, amount, type, startOrEnd, toSelected ) {
 		var me = this;
 
 		return function() {
-			var update = {},
-				date = toSelected ? 'selectedDate' : 'viewDate'
-			;
-
+			var update = {}, date;
+			if (startOrEnd) {
+        date = toSelected ? 'selectedStartDate' : 'viewStartDate';
+      } else {
+        date = toSelected ? 'selectedEndDate' : 'viewEndDate';
+      }
 			update[ date ] = me.state[ date ].clone()[ op ]( amount, type );
 
 			me.setState( update );
@@ -262,12 +255,15 @@ var Datetime = React.createClass({
 	},
 
 	allowedSetTime: ['hours', 'minutes', 'seconds', 'milliseconds'],
-	setTime: function( type, value ) {
+	setTime: function( type, value, startOrEnd ) {
 		var index = this.allowedSetTime.indexOf( type ) + 1,
 			state = this.state,
-			date = (state.selectedDate || state.viewDate).clone(),
+			date = (state.selectedStartDate || state.viewStartDate).clone(),
 			nextType
 		;
+		if (!startOrEnd) {
+      date = (state.selectedEndDate || state.viewEndDate).clone();
+    }
 
 		// It is needed to set all the time properties
 		// to not to reset the time
@@ -278,22 +274,37 @@ var Datetime = React.createClass({
 		}
 
 		if ( !this.props.value ) {
-			this.setState({
-				selectedDate: date,
-				inputValue: date.format( state.inputFormat )
-			});
+		  if(startOrEnd){
+        this.setState({
+          selectedStartDate: date,
+          inputValue: `${date.format(state.inputFormat)} -- ${state.selectedEndDate.format(state.inputFormat)}`,
+        });
+      } else {
+        this.setState({
+          selectedEndDate: date,
+          inputValue: `${state.selectedStartDate.format(state.inputFormat)} -- ${date.format(state.inputFormat)}`,
+        });
+      }
+
 		}
 		this.props.onChange( date );
 	},
 
-	updateSelectedDate: function( e, close ) {
+	updateSelectedDate: function( e, startOrEnd, close ) {
 		var target = e.target,
 			modifier = 0,
-			viewDate = this.state.viewDate,
-			currentDate = this.state.selectedDate || viewDate,
+			viewDate,
+			currentDate,
 			date
     ;
 
+    if (startOrEnd === 'start') {
+      viewDate = this.state.viewStartDate;
+      currentDate = this.state.selectedStartDate || viewDate;
+    } else {
+      viewDate = this.state.viewEndDate;
+      currentDate = this.state.selectedEndDate || viewDate;
+    }
 		if (target.className.indexOf('rdtDay') !== -1) {
 			if (target.className.indexOf('rdtNew') !== -1)
 				modifier = 1;
@@ -325,12 +336,21 @@ var Datetime = React.createClass({
 				this.props.onBlur( date );
 			}
 
-			this.setState({
-				selectedDate: date,
-				viewDate: date.clone().startOf('month'),
-				inputValue: date.format( this.state.inputFormat ),
-				open: open
-			});
+			if (startOrEnd === 'start') {
+        this.setState({
+          selectedStartDate: date,
+          viewStartDate: date.clone().startOf('month'),
+          inputValue: `${date.format(this.state.inputFormat)} -- ${this.state.selectedEndDate.format(this.state.inputFormat)}`,
+          open: open
+        });
+      } else {
+        this.setState({
+          selectedEndDate: date,
+          viewEndDate: date.clone().startOf('month'),
+          inputValue: `${date.format(this.state.inputFormat)} -- ${date.format(this.state.inputFormat)}`,
+          open: open
+        });
+      }
 		} else {
 			if ( this.props.closeOnSelect && close ) {
 				this.closeCalendar();
@@ -342,24 +362,26 @@ var Datetime = React.createClass({
 
 	openCalendar: function() {
 		if (!this.state.open) {
-			this.setState({ open: true, currentView: this.props.viewMode, viewDate: this.state.selectedDate.clone() }, function() {
+			this.setState({ open: true, currentView: this.props.viewMode, viewStartDate: this.state.selectedStartDate.clone(),
+        viewEndDate: this.state.selectedEndDate.clone() }, function() {
 				this.props.onFocus();
 			});
 		}
 	},
 
 	closeCalendar: function() {
-		this.setState({ open: false }, function () {
-			this.props.onBlur( this.state.selectedDate || this.state.inputValue );
+    var currentView = this.state.viewMode === 'time'? 'days':this.state.viewMode;
+		this.setState({ open: false, currentStartView: currentView, currentEndView: currentView }, function () {
+			this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
 		});
 	},
 
 	handleClickOutside: function() {
-		if ( this.props.input && this.state.open && !this.props.open ) {
-			this.setState({ open: false }, function() {
-				this.props.onBlur( this.state.selectedDate || this.state.inputValue );
-			});
-		}
+		// if ( this.props.input && this.state.open && !this.props.open ) {
+		// 	this.setState({ open: false }, function() {
+		// 		this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
+		// 	});
+		// }
 	},
 
 	localMoment: function( date, format, props ) {
@@ -370,38 +392,77 @@ var Datetime = React.createClass({
 			m.locale( props.locale );
 		return m;
 	},
-
 	componentProps: {
-		fromProps: ['value', 'isValidDate', 'renderDay', 'renderMonth', 'renderYear', 'timeConstraints'],
-		fromState: ['viewDate', 'selectedDate', 'updateOn'],
+		fromProps: ['startTime', 'endTime', 'isValidDate', 'renderDay', 'renderMonth', 'renderYear', 'timeConstraints'],
+		fromState: ['viewStartDate', 'selectedStartDate', 'viewEndDate', 'selectedEndDate', 'updateOn', 'viewMode'],
 		fromThis: ['setDate', 'setTime', 'showView', 'addTime', 'subtractTime', 'updateSelectedDate', 'localMoment', 'handleClickOutside']
 	},
 
-	getComponentProps: function() {
+  getTimeConstraints: function (startTime, endTime) {
+    const timeConstraints = {};
+    if (startTime !== undefined) {
+      if (moment(endTime).startOf('day').isSame(moment(startTime).startOf('day'))) {
+        timeConstraints.hours = { min: startTime.hours() };
+        if (endTime.hours() === startTime.hours()) {
+          timeConstraints.minutes = { min: startTime.minutes() };
+          if (endTime.minutes() === startTime.minutes()) {
+            timeConstraints.seconds = {
+              min: startTime.seconds()
+            };
+          }
+        }
+      }
+      return timeConstraints;
+    }
+  },
+
+  isValidDate: function(currentDate) {
+    const startMoment = moment(this.state.viewStartDate);
+    const startDayMoment = startMoment.startOf('day');
+    const cur = moment(currentDate);
+    return cur.isSameOrAfter(startDayMoment);
+  },
+
+	getComponentProps: function(tag) {
 		var me = this,
-			formats = this.getFormats( this.props ),
-			props = {dateFormat: formats.date, timeFormat: formats.time}
-		;
+      props = {dateFormat: this.props.dateFormat, timeFormat: this.props.timeFormat};
 
 		this.componentProps.fromProps.forEach( function( name ) {
 			props[ name ] = me.props[ name ];
 		});
+
 		this.componentProps.fromState.forEach( function( name ) {
-			props[ name ] = me.state[ name ];
+      props[ name ] = me.state[ name ];
 		});
 		this.componentProps.fromThis.forEach( function( name ) {
 			props[ name ] = me[ name ];
 		});
-
+		if (tag === 'start') {
+		  props[ tag ] = true;
+    } else {
+      props[ tag ] = false;
+      props.timeConstraints  = this.getTimeConstraints(this.state.selectedStartDate.clone() || this.props.startTime.clone(), this.state.selectedEndDate.clone() || this.props.endTime.clone());
+      props.isValidDate  = this.isValidDate;
+    }
 		return props;
 	},
+
+
+
+  changeViewMode: function(view) {
+	  var inputFormat = this.getFormats(this.props)[view];
+	  var inputValue = `${this.state.selectedStartDate.format(inputFormat)} -- ${this.state.selectedEndDate.format(inputFormat)}`;
+	  var currentView = view === 'time'? 'days':view;
+    this.setState({ currentStartView: currentView, currentEndView: currentView , viewMode: view, inputFormat, inputValue});
+  },
 
 	render: function() {
 		var DOM = React.DOM,
 			className = 'rdt' + (this.props.className ?
                   ( Array.isArray( this.props.className ) ?
                   ' ' + this.props.className.join( ' ' ) : ' ' + this.props.className) : ''),
-			children = []
+			children = [],
+      className1 = 'time-box'
 		;
 
 		if ( this.props.input ) {
@@ -418,14 +479,45 @@ var Datetime = React.createClass({
 			className += ' rdtStatic';
 		}
 
-		if ( this.state.open )
-			className += ' rdtOpen';
-
-		return DOM.div({className: className}, children.concat(
-			DOM.div(
-				{ key: 'dt', className: 'rdtPicker' },
-				React.createElement( CalendarContainer, {view: this.state.currentView, viewProps: this.getComponentProps(), onClickOutside: this.handleClickOutside })
-			)
+		if ( this.state.open ) {
+      className += ' rdtOpen';
+      className1 += ' rdtOpen';
+    }
+    var that = this;
+		return DOM.div({className: className}, children.concat(DOM.div( {className: className1},
+      DOM.div({className: 'select-item'},
+        DOM.span({ key: 'years', className: this.state.viewMode === 'years'? 'item item-selected':'item', onClick: function(event) {
+          event.preventDefault();
+          that.changeViewMode('years');
+        }}, 'Year'),
+        DOM.span({ key: 'months', className: this.state.viewMode === 'months'? 'item item-selected':'item', onClick: function(event) {
+          event.preventDefault();
+          that.changeViewMode('months');
+        }}, 'Months'),
+        DOM.span({ key: 'days', className: this.state.viewMode === 'days'? 'item item-selected':'item', onClick: function(event) {
+          event.preventDefault();
+          that.changeViewMode('days');
+        }}, 'Day'),
+        DOM.span({ key: 'time', className: this.state.viewMode === 'time'? 'item item-selected':'item', onClick: function(event) {
+          event.preventDefault();
+          that.changeViewMode('time');
+        }}, 'Hour')),
+      DOM.div({className: 'time-slot'},DOM.div({className: 'left-time-container'},
+        DOM.div({ key: 'dt', className: 'rdtPicker start-time' },
+        React.createElement( CalendarContainer, {view: this.state.currentStartView, viewProps: this.getComponentProps('start'), onClickOutside: this.handleClickOutside })),
+        DOM.button({className: 'cancel-button', onClick: function(event) {
+		        event.preventDefault();
+		        that.closeCalendar();
+        }}, 'CANCEL')),
+        DOM.div({className: 'right-time-container'},
+          DOM.div({ key: 'dt1', className: 'rdtPicker end-time' },
+          React.createElement( CalendarContainer, {view: this.state.currentEndView, viewProps: this.getComponentProps('end'), onClickOutside: this.handleClickOutside })),
+          DOM.button({className: 'search-button', onClick: function(event) {
+            event.preventDefault();
+            that.props.searchByTime(that.state.selectedStartDate, that.state.selectedEndDate, that.state.viewMode);
+            that.closeCalendar();
+          }}, 'SEARCH'))
+        ))
 		));
 	}
 });

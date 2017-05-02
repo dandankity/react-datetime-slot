@@ -9,7 +9,7 @@ var DOM = React.DOM;
 var DateTimePickerDays = onClickOutside( React.createClass({
 	render: function() {
 		var footer = this.renderFooter(),
-			date = this.props.viewDate,
+			date = this.props.start? this.props.viewStartDate : this.props.viewEndDate,
 			locale = date.localeData(),
 			tableChildren
 		;
@@ -17,16 +17,16 @@ var DateTimePickerDays = onClickOutside( React.createClass({
 		tableChildren = [
 			DOM.thead({ key: 'th' }, [
 				DOM.tr({ key: 'h' }, [
-					DOM.th({ key: 'p', className: 'rdtPrev' }, DOM.span({ onClick: this.props.subtractTime( 1, 'months' )}, '‹' )),
-					DOM.th({ key: 's', className: 'rdtSwitch', onClick: this.props.showView( 'months' ), colSpan: 5, 'data-value': this.props.viewDate.month() }, locale.months( date ) + ' ' + date.year() ),
-					DOM.th({ key: 'n', className: 'rdtNext' }, DOM.span({ onClick: this.props.addTime( 1, 'months' )}, '›' ))
+					DOM.th({ key: 'p', className: 'rdtPrev' }, DOM.span({ onClick: this.props.subtractTime( 1, 'months', this.props.start )}, '‹' )),
+					DOM.th({ key: 's', className: 'rdtSwitch', onClick: this.props.showView( 'months', this.props.start ), colSpan: 5, 'data-value': date.month() }, locale.months( date ) + ' ' + date.year() ),
+					DOM.th({ key: 'n', className: 'rdtNext' }, DOM.span({ onClick: this.props.addTime( 1, 'months', this.props.start )}, '›' ))
 				]),
 				DOM.tr({ key: 'd'}, this.getDaysOfWeek( locale ).map( function( day, index ) { return DOM.th({ key: day + index, className: 'dow'}, day ); }) )
 			]),
 			DOM.tbody({ key: 'tb' }, this.renderDays())
 		];
 
-		if ( footer )
+		if ( footer && this.props.viewMode === 'time' )
 			tableChildren.push( footer );
 
 		return DOM.div({ className: 'rdtDays' },
@@ -54,8 +54,8 @@ var DateTimePickerDays = onClickOutside( React.createClass({
 	},
 
 	renderDays: function() {
-		var date = this.props.viewDate,
-			selected = this.props.selectedDate && this.props.selectedDate.clone(),
+		var date = this.props.start? this.props.viewStartDate : this.props.viewEndDate,
+			selected = this.props.start? this.props.selectedStartDate.clone() : this.props.selectedEndDate.clone(),
 			prevMonth = date.clone().subtract( 1, 'months' ),
 			currentYear = date.year(),
 			currentMonth = date.month(),
@@ -112,7 +112,11 @@ var DateTimePickerDays = onClickOutside( React.createClass({
 	},
 
 	updateSelectedDate: function( event ) {
-		this.props.updateSelectedDate( event, true );
+    if (this.props.start) {
+      this.props.updateSelectedDate( event, 'start', true );
+    } else {
+      this.props.updateSelectedDate( event, 'end', true );
+    }
 	},
 
 	renderDay: function( props, currentDate ) {
@@ -123,11 +127,11 @@ var DateTimePickerDays = onClickOutside( React.createClass({
 		if ( !this.props.timeFormat )
 			return '';
 
-		var date = this.props.selectedDate || this.props.viewDate;
+		var date = this.props.start? this.props.selectedStartDate : this.props.selectedEndDate;
 
 		return DOM.tfoot({ key: 'tf'},
 			DOM.tr({},
-				DOM.td({ onClick: this.props.showView( 'time' ), colSpan: 7, className: 'rdtTimeToggle' }, date.format( this.props.timeFormat ))
+				DOM.td({ onClick: this.props.showView( 'time', this.props.start ), colSpan: 7, className: 'rdtTimeToggle' }, date.format( this.props.timeFormat ))
 			)
 		);
 	},

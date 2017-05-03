@@ -78,7 +78,7 @@ var Datetime = React.createClass({
 		updateOn = this.getUpdateOn(format);
 
 		if ( selectedStartDate && selectedEndDate )
-			inputValue = `${selectedStartDate.format(format)} - ${selectedEndDate.format(format)}`;
+			inputValue = selectedStartDate.format(format) + ' -- ' + selectedEndDate.format(format);
 		else
 			inputValue = '';
 
@@ -277,12 +277,12 @@ var Datetime = React.createClass({
 		  if(startOrEnd){
         this.setState({
           selectedStartDate: date,
-          inputValue: `${date.format(state.inputFormat)} -- ${state.selectedEndDate.format(state.inputFormat)}`,
+          inputValue: date.format(state.inputFormat) + ' -- ' + state.selectedEndDate.format(state.inputFormat),
         });
       } else {
         this.setState({
           selectedEndDate: date,
-          inputValue: `${state.selectedStartDate.format(state.inputFormat)} -- ${date.format(state.inputFormat)}`,
+          inputValue: state.selectedStartDate.format(state.inputFormat) + ' -- ' + date.format(state.inputFormat),
         });
       }
 
@@ -340,14 +340,14 @@ var Datetime = React.createClass({
         this.setState({
           selectedStartDate: date,
           viewStartDate: date.clone().startOf('month'),
-          inputValue: `${date.format(this.state.inputFormat)} -- ${this.state.selectedEndDate.format(this.state.inputFormat)}`,
+          inputValue: date.format(this.state.inputFormat) + ' -- ' + this.state.selectedEndDate.format(this.state.inputFormat),
           open: open
         });
       } else {
         this.setState({
           selectedEndDate: date,
           viewEndDate: date.clone().startOf('month'),
-          inputValue: `${date.format(this.state.inputFormat)} -- ${date.format(this.state.inputFormat)}`,
+          inputValue: date.format(this.state.inputFormat)} + ' -- ' + date.format(this.state.inputFormat),
           open: open
         });
       }

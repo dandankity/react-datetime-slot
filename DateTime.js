@@ -347,7 +347,7 @@ var Datetime = React.createClass({
         this.setState({
           selectedEndDate: date,
           viewEndDate: date.clone().startOf('month'),
-          inputValue: date.format(this.state.inputFormat)} + ' -- ' + date.format(this.state.inputFormat),
+          inputValue: this.state.selectedStartDate.format(this.state.inputFormat) + ' -- ' + date.format(this.state.inputFormat),
           open: open
         });
       }

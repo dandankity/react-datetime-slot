@@ -111,8 +111,8 @@ var Datetime = React.createClass({
 	getFormats: function( props ) {
 		var formats = {
 		    years: 'YYYY',
-        months: 'MM/YY HH:00:00',
-        days: 'DD/MM/YY HH:00:00',
+        months: 'MM/YY',
+        days: 'DD/MM/YY',
 				time: props.dateFormat + ' ' + props.timeFormat
 			};
 
@@ -485,7 +485,7 @@ var Datetime = React.createClass({
     }
     var that = this;
 		return DOM.div({className: className}, children.concat(DOM.div( {className: className1},
-      DOM.div({className: 'select-item'},
+      DOM.div({key: 'select-item', className: 'select-item'},
         DOM.span({ key: 'years', className: this.state.viewMode === 'years'? 'item item-selected':'item', onClick: function(event) {
           event.preventDefault();
           that.changeViewMode('years');
@@ -502,14 +502,14 @@ var Datetime = React.createClass({
           event.preventDefault();
           that.changeViewMode('time');
         }}, 'Hour')),
-      DOM.div({className: 'time-slot'},DOM.div({className: 'left-time-container'},
+      DOM.div({key: 'time-slot', className: 'time-slot'},DOM.div({key: 'left', className: 'left-time-container'},
         DOM.div({ key: 'dt', className: 'rdtPicker start-time' },
         React.createElement( CalendarContainer, {view: this.state.currentStartView, viewProps: this.getComponentProps('start'), onClickOutside: this.handleClickOutside })),
         DOM.button({className: 'cancel-button', onClick: function(event) {
 		        event.preventDefault();
 		        that.closeCalendar();
         }}, 'CANCEL')),
-        DOM.div({className: 'right-time-container'},
+        DOM.div({key: 'right', className: 'right-time-container'},
           DOM.div({ key: 'dt1', className: 'rdtPicker end-time' },
           React.createElement( CalendarContainer, {view: this.state.currentEndView, viewProps: this.getComponentProps('end'), onClickOutside: this.handleClickOutside })),
           DOM.button({className: 'search-button', onClick: function(event) {

@@ -9,6 +9,8 @@
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.32);
   border: solid 1px #979797;
   background: #ffffff;
+  right: 0px;
+  z-index: 99999 !important;
 }
 .time-slot {
   width: 510px;

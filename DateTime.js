@@ -453,7 +453,7 @@ var Datetime = React.createClass({
 	  var inputFormat = this.getFormats(this.props)[view];
 	  var inputValue = this.state.selectedStartDate.format(inputFormat) + ' -- ' + this.state.selectedEndDate.format(inputFormat);
 	  var currentView = view === 'time'? 'days':view;
-    this.setState({ currentStartView: currentView, currentEndView: currentView , viewMode: view, inputFormat, inputValue});
+    this.setState({ currentStartView: currentView, currentEndView: currentView , viewMode: view, inputFormat: inputFormat, inputValue: inputValue});
   },
 
 	render: function() {

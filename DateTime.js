@@ -275,9 +275,11 @@ var DatetimeSlot = React.createClass({
 
 		if ( !this.props.value ) {
 		  if(startOrEnd){
+        var endDate = date > this.state.selectedEndDate? date.clone() : state.selectedEndDate.clone();
         this.setState({
           selectedStartDate: date,
-          inputValue: date.format(state.inputFormat) + ' -- ' + state.selectedEndDate.format(state.inputFormat),
+          selectedEndDate: endDate,
+          inputValue: date.format(state.inputFormat) + ' -- ' + endDate.format(state.inputFormat),
         });
       } else {
         this.setState({
@@ -337,10 +339,13 @@ var DatetimeSlot = React.createClass({
 			}
 
 			if (startOrEnd === 'start') {
+        var endDate = date > this.state.selectedEndDate? date.clone(): this.state.selectedEndDate.clone();
         this.setState({
           selectedStartDate: date,
+          selectedEndDate: endDate,
           viewStartDate: date.clone().startOf('month'),
-          inputValue: date.format(this.state.inputFormat) + ' -- ' + this.state.selectedEndDate.format(this.state.inputFormat),
+          viewEndDate: endDate.clone().startOf('month'),
+          inputValue: date.format(this.state.inputFormat) + ' -- ' + endDate.format(this.state.inputFormat),
           open: open
         });
       } else {

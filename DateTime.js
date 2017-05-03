@@ -7,7 +7,7 @@ var assign = require('object-assign'),
 ;
 
 var TYPES = React.PropTypes;
-var Datetime = React.createClass({
+var DatetimeSlot = React.createClass({
 	propTypes: {
 		// value: TYPES.object | TYPES.string,
 		// defaultValue: TYPES.object | TYPES.string,
@@ -523,6 +523,6 @@ var Datetime = React.createClass({
 });
 
 // Make moment accessible through the Datetime class fine
-Datetime.moment = moment;
+DatetimeSlot.moment = moment;
 
-module.exports = Datetime;
+module.exports = DatetimeSlot;

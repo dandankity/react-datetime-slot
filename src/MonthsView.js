@@ -5,7 +5,7 @@ var React = require('react'),
 ;
 
 var DOM = React.DOM;
-var DateTimePickerMonths = onClickOutside( React.createClass({
+var DateTimeSlotPickerMonths = onClickOutside( React.createClass({
 	render: function() {
     var viewDate = this.props.start? this.props.viewStartDate : this.props.viewEndDate
     return DOM.div({ className: 'rdtMonths' }, [
@@ -109,4 +109,4 @@ function capitalize( str ) {
 	return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 }
 
-module.exports = DateTimePickerMonths;
+module.exports = DateTimeSlotPickerMonths;

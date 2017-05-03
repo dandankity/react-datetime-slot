@@ -6,7 +6,7 @@ var React = require('react'),
 	;
 
 var DOM = React.DOM;
-var DateTimePickerTime = onClickOutside(React.createClass({
+var DateTimeSlotPickerTime = onClickOutside(React.createClass({
 	getInitialState: function () {
 		return this.calculateState(this.props);
 	},
@@ -236,4 +236,4 @@ var DateTimePickerTime = onClickOutside(React.createClass({
 	}
 }));
 
-module.exports = DateTimePickerTime;
+module.exports = DateTimeSlotPickerTime;

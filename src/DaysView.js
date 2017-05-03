@@ -6,7 +6,7 @@ var React = require('react'),
 ;
 
 var DOM = React.DOM;
-var DateTimePickerDays = onClickOutside( React.createClass({
+var DateTimeSlotPickerDays = onClickOutside( React.createClass({
 	render: function() {
 		var footer = this.renderFooter(),
 			date = this.props.start? this.props.viewStartDate : this.props.viewEndDate,
@@ -145,4 +145,4 @@ var DateTimePickerDays = onClickOutside( React.createClass({
   }
 }));
 
-module.exports = DateTimePickerDays;
+module.exports = DateTimeSlotPickerDays;

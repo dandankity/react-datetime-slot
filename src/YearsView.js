@@ -5,7 +5,7 @@ var React = require('react'),
 ;
 
 var DOM = React.DOM;
-var DateTimePickerYears = onClickOutside( React.createClass({
+var DateTimeSlotPickerYears = onClickOutside( React.createClass({
 	render: function() {
 	  var viewDate = this.props.start? this.props.viewStartDate : this.props.viewEndDate
 		var year = parseInt( viewDate.year() / 10, 10 ) * 10;
@@ -108,4 +108,4 @@ var DateTimePickerYears = onClickOutside( React.createClass({
   }
 }));
 
-module.exports = DateTimePickerYears;
+module.exports = DateTimeSlotPickerYears;

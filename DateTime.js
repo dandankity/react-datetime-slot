@@ -127,6 +127,8 @@ var DatetimeSlot = onClickOutside(React.createClass({
       format = formats[nextProps.viewMode],
       updatedState = {};
     updatedState.viewMode = nextProps.viewMode;
+    updatedState.searchedViewMode = nextProps.viewMode;
+
     var currentView = nextProps.viewMode === 'time'? 'days':nextProps.viewMode;
     updatedState.currentStartView = currentView;
     updatedState.currentEndView = currentView;

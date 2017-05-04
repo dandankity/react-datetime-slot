@@ -418,7 +418,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
 
     if (this.props.startTimeLimitation.isValid() && this.props.endTimeLimitation.isValid()) {
       startMoment = moment(this.props.startTimeLimitation);
-      endMoment = this.props.endTimeLimitation < this.state.viewEndDate? moment(this.props.endTimeLimitation) : moment(this.state.viewEndDate);
+      endMoment = this.props.endTimeLimitation > this.state.viewEndDate? moment(this.props.endTimeLimitation) : moment(this.state.viewEndDate);
       return cur.isSameOrAfter(startMoment.startOf('day')) && cur.isSameOrBefore(endMoment.startOf('day'));
     } else {
       startMoment = moment(this.state.viewStartDate)

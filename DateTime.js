@@ -355,10 +355,10 @@ var DatetimeSlot = onClickOutside(React.createClass({
       viewMode: this.state.searchedViewMode,
       currentStartView: currentView,
       currentEndView: currentView,
-      selectedStartDate: this.state.searchedStartDate,
-      selectedEndDate: this.state.searchedEndDate,
+      selectedStartDate: this.state.searchedStartDate.clone(),
+      selectedEndDate: this.state.searchedEndDate.clone(),
       inputFormat: format,
-      inputValue: this.state.searchedStartDate.format(format) + ' -- ' + this.state.searchedEndDate.format(format)
+      inputValue: this.state.searchedStartDate.clone().format(format) + ' -- ' + this.state.searchedEndDate.clone().format(format)
     }, function () {
       this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
     });
@@ -455,9 +455,12 @@ var DatetimeSlot = onClickOutside(React.createClass({
   },
   searchDate: function(event) {
     event.preventDefault();
-    this.setState({searchedStartDate: this.state.selectedStartDate, searchedEndDate: this.state.selectedEndDate, searchedViewMode:this.state.viewMode});
-    this.props.searchByTime(this.state.selectedStartDate, this.state.selectedEndDate, this.state.viewMode);
-    this.closeCalendar();
+    var me = this;
+    me.setState({searchedStartDate: me.state.selectedStartDate.clone(), searchedEndDate: me.state.selectedEndDate.clone(), searchedViewMode:me.state.viewMode}, function() {
+      this.closeCalendar();
+    });
+    this.props.searchByTime(me.state.selectedStartDate.clone(), me.state.selectedEndDate.clone(), me.state.viewMode);
+
   },
 
 

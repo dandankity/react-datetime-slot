@@ -385,21 +385,25 @@ var DatetimeSlot = onClickOutside(React.createClass({
   },
 
   getTimeConstraints: function (tag) {
-    var timeConstraints = {}, startLimitation, endLimitation;
+    var timeConstraints = {hours: {}}, startLimitation, endLimitation;
     startLimitation = this.state.selectedStartDate.clone() || this.props.startTime.clone();
     endLimitation = this.state.selectedEndDate.clone() || this.props.endTime.clone();
-    if (moment(endLimitation).startOf('day').isSame(moment(startLimitation).startOf('day'))) {
-      if(tag === 'start'){
-        if (this.props.startTimeLimitation.isValid() && moment(startLimitation).startOf('day').isSame(moment(this.props.startTimeLimitation).startOf('day'))) {
-          timeConstraints.hours = { min : this.props.startTimeLimitation.hours()}
-        }
-      } else {
+    if(tag === 'start'){
+      if (this.props.startTimeLimitation.isValid() && moment(startLimitation).startOf('day').isSame(moment(this.props.startTimeLimitation).startOf('day'))) {
+        timeConstraints.hours = { min : this.props.startTimeLimitation.hours()}
+      }
+      if (this.props.endTimeLimitation.isValid() && moment(startLimitation).startOf('day').isSame(moment(this.props.endTimeLimitation).startOf('day'))) {
+        timeConstraints.hours['max'] = this.props.endTimeLimitation.hours();
+      }
+    } else {
+      if (moment(endLimitation).startOf('day').isSame(moment(startLimitation).startOf('day'))) {
         timeConstraints.hours = { min: startLimitation.hours() };
-        if (this.props.endTimeLimitation.isValid() && moment(endLimitation).startOf('day').isSame(moment(this.props.endTimeLimitation).startOf('day'))) {
-          timeConstraints.hours['max'] = this.props.endTimeLimitation.hours();
-        }
+      }
+      if (this.props.endTimeLimitation.isValid() && moment(endLimitation).startOf('day').isSame(moment(this.props.endTimeLimitation).startOf('day'))) {
+        timeConstraints.hours['max'] = this.props.endTimeLimitation.hours();
       }
     }
+
     return timeConstraints;
   },
 

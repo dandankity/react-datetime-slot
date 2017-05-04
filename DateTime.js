@@ -356,9 +356,9 @@ var DatetimeSlot = onClickOutside(React.createClass({
       currentStartView: currentView,
       currentEndView: currentView,
       selectedStartDate: this.state.searchedStartDate,
-      selectedEndDate: this.state.searchedStartDate,
+      selectedEndDate: this.state.searchedEndDate,
       inputFormat: format,
-      inputValue: this.state.searchedStartDate.format(format) + ' -- ' + this.state.searchedStartDate.format(format)
+      inputValue: this.state.searchedStartDate.format(format) + ' -- ' + this.state.searchedEndDate.format(format)
     }, function () {
       this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
     });

@@ -366,9 +366,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
 
   handleClickOutside: function() {
     if ( this.state.open && !this.props.open ) {
-      this.setState({ open: false }, function() {
-        this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
-      });
+      this.closeCalendar();
     }
   },
 

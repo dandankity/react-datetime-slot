@@ -60,6 +60,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
     state.currentStartView = this.props.dateFormat ? (this.props.viewMode || state.updateOn || 'days') : 'time';
     state.currentEndView = state.currentStartView;
     state.viewMode = this.props.viewMode;
+    state.searchedViewMode = this.props.viewMode;
 
     return state;
   },
@@ -89,6 +90,8 @@ var DatetimeSlot = onClickOutside(React.createClass({
       viewEndDate: viewEndDate,
       selectedStartDate: selectedStartDate,
       selectedEndDate: selectedEndDate,
+      searchedStartDate: selectedStartDate,
+      searchedEndDate: selectedEndDate,
       inputValue: inputValue,
       open: props.open
     };
@@ -132,9 +135,11 @@ var DatetimeSlot = onClickOutside(React.createClass({
     var updatedSelectedStartDate = this.localMoment(nextProps.startTime.clone(), format );
     updatedState.selectedStartDate = updatedSelectedStartDate;
     updatedState.viewStartDate = updatedSelectedStartDate;
+    updatedState.searchedStartDate = updatedSelectedStartDate;
     var updatedSelectedEndDate = this.localMoment(nextProps.endTime.clone(), format );
     updatedState.selectedEndDate = updatedSelectedEndDate;
     updatedState.viewEndDate = updatedSelectedEndDate;
+    updatedState.searchedEndDate = updatedSelectedEndDate;
     updatedState.inputValue = updatedSelectedStartDate.format(format) + ' -- ' + updatedSelectedEndDate.format(format);
 
     this.setState( updatedState );
@@ -342,17 +347,26 @@ var DatetimeSlot = onClickOutside(React.createClass({
   },
 
   closeCalendar: function() {
-    var currentView = this.state.viewMode === 'time'? 'days':this.state.viewMode;
-    this.setState({ open: false, currentStartView: currentView, currentEndView: currentView }, function () {
+    var currentView = this.state.searchedViewMode === 'time'? 'days':this.state.searchedViewMode;
+    var format = this.getFormats(this.props)[this.state.searchedViewMode];
+    this.setState({ open: false,
+      viewMode: this.state.searchedViewMode,
+      currentStartView: currentView,
+      currentEndView: currentView,
+      selectedStartDate: this.state.searchedStartDate,
+      selectedEndDate: this.state.searchedStartDate,
+      inputFormat: format,
+      inputValue: this.state.searchedStartDate.format(format) + ' -- ' + this.state.searchedStartDate.format(format)
+    }, function () {
       this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
     });
   },
 
   handleClickOutside: function() {
     if ( this.state.open && !this.props.open ) {
-    	this.setState({ open: false }, function() {
-    		this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
-    	});
+      this.setState({ open: false }, function() {
+        this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
+      });
     }
   },
 
@@ -437,7 +451,12 @@ var DatetimeSlot = onClickOutside(React.createClass({
     }
     return props;
   },
-
+  searchDate: function(event) {
+    event.preventDefault();
+    this.setState({searchedStartDate: this.state.selectedStartDate, selectedEndDate: this.state.selectedEndDate, searchedViewMode:this.state.viewMode});
+    this.props.searchByTime(this.state.selectedStartDate, this.state.selectedEndDate, this.state.viewMode);
+    this.closeCalendar();
+  },
 
 
   changeViewMode: function(view) {
@@ -503,11 +522,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
         DOM.div({key: 'right', className: 'right-time-container'},
           DOM.div({ key: 'dt1', className: 'rdtPicker end-time' },
             React.createElement( CalendarContainer, {view: this.state.currentEndView, viewProps: this.getComponentProps('end')})),
-          DOM.button({className: 'search-button', onClick: function(event) {
-            event.preventDefault();
-            that.props.searchByTime(that.state.selectedStartDate, that.state.selectedEndDate, that.state.viewMode);
-            that.closeCalendar();
-          }}, 'SEARCH'))
+          DOM.button({className: 'search-button', onClick: this.searchDate }, 'SEARCH'))
       ))
     ));
   },

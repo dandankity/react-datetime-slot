@@ -135,7 +135,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
     var updatedSelectedEndDate = this.localMoment(nextProps.endTime.clone(), format );
     updatedState.selectedEndDate = updatedSelectedEndDate;
     updatedState.viewEndDate = updatedSelectedEndDate;
-    format = nextProps.endTimeLimitation.isValid()? format.time : format.days
+    format = nextProps.endTimeLimitation.isValid()? formats.time : formats.days;
     updatedState.inputValue = updatedSelectedStartDate.format(format) + ' -- ' + updatedSelectedEndDate.format(format);
 
     this.setState( updatedState );

@@ -78,7 +78,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
     updateOn = this.getUpdateOn(format);
 
     if ( selectedStartDate && selectedEndDate )
-      inputValue = selectedStartDate.format(formats['days']) + ' -- ' + selectedEndDate.format(formats['days']);
+      inputValue = selectedStartDate.format(format) + ' -- ' + selectedEndDate.format(format);
     else
       inputValue = '';
 
@@ -135,7 +135,6 @@ var DatetimeSlot = onClickOutside(React.createClass({
     var updatedSelectedEndDate = this.localMoment(nextProps.endTime.clone(), format );
     updatedState.selectedEndDate = updatedSelectedEndDate;
     updatedState.viewEndDate = updatedSelectedEndDate;
-    format = nextProps.endTimeLimitation.isValid()? formats.time : formats.days;
     updatedState.inputValue = updatedSelectedStartDate.format(format) + ' -- ' + updatedSelectedEndDate.format(format);
 
     this.setState( updatedState );
@@ -269,10 +268,10 @@ var DatetimeSlot = onClickOutside(React.createClass({
 
     if (startOrEnd === 'start') {
       viewDate = this.state.viewStartDate;
-      currentDate = this.state.selectedStartDate || viewDate;
+      currentDate = viewDate;
     } else {
       viewDate = this.state.viewEndDate;
-      currentDate = this.state.selectedEndDate || viewDate;
+      currentDate = viewDate;
     }
     if (target.className.indexOf('rdtDay') !== -1) {
       if (target.className.indexOf('rdtNew') !== -1)

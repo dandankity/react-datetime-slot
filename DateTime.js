@@ -455,7 +455,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
   },
   searchDate: function(event) {
     event.preventDefault();
-    this.setState({searchedStartDate: this.state.selectedStartDate, selectedEndDate: this.state.selectedEndDate, searchedViewMode:this.state.viewMode});
+    this.setState({searchedStartDate: this.state.selectedStartDate, searchedEndDate: this.state.selectedEndDate, searchedViewMode:this.state.viewMode});
     this.props.searchByTime(this.state.selectedStartDate, this.state.selectedEndDate, this.state.viewMode);
     this.closeCalendar();
   },

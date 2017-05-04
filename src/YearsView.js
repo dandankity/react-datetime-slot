@@ -104,7 +104,7 @@ var DateTimeSlotPickerYears = onClickOutside( React.createClass({
 	},
 
   handleClickOutside: function() {
-    this.props.handleClickOutside();
+    // this.props.handleClickOutside();
   }
 }));
 

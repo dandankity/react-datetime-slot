@@ -3,11 +3,11 @@
 var assign = require('object-assign'),
   moment = require('moment'),
   React = require('react'),
-  CalendarContainer = require('./src/CalendarContainer')
-  ;
+  onClickOutside = require('react-onclickoutside'),
+  CalendarContainer = require('./src/CalendarContainer');
 
 var TYPES = React.PropTypes;
-var DatetimeSlot = React.createClass({
+var DatetimeSlot = onClickOutside(React.createClass({
   propTypes: {
     // value: TYPES.object | TYPES.string,
     // defaultValue: TYPES.object | TYPES.string,
@@ -65,10 +65,10 @@ var DatetimeSlot = React.createClass({
   },
 
   getStateFromProps: function( props ) {
-    var format = this.getFormats( props )[props.viewMode],
+    var formats = this.getFormats(props),
+      format = formats[props.viewMode],
       startDate = props.startTime, endDate = props.endTime,
-      selectedStartDate, selectedEndDate, viewStartDate, viewEndDate, updateOn, inputValue
-      ;
+      selectedStartDate, selectedEndDate, viewStartDate, viewEndDate, updateOn, inputValue;
 
     selectedStartDate = this.localMoment( startDate, format );
     selectedEndDate = this.localMoment( endDate, format );
@@ -78,7 +78,7 @@ var DatetimeSlot = React.createClass({
     updateOn = this.getUpdateOn(format);
 
     if ( selectedStartDate && selectedEndDate )
-      inputValue = selectedStartDate.format(format) + ' -- ' + selectedEndDate.format(format);
+      inputValue = selectedStartDate.format(formats['days']) + ' -- ' + selectedEndDate.format(formats['days']);
     else
       inputValue = '';
 
@@ -135,6 +135,9 @@ var DatetimeSlot = React.createClass({
     var updatedSelectedEndDate = this.localMoment(nextProps.endTime.clone(), format );
     updatedState.selectedEndDate = updatedSelectedEndDate;
     updatedState.viewEndDate = updatedSelectedEndDate;
+    if (nextProps.endTimeLimitation.isValid()) {
+      format = formats.time;
+    }
     updatedState.inputValue = updatedSelectedStartDate.format(format) + ' -- ' + updatedSelectedEndDate.format(format);
 
     this.setState( updatedState );
@@ -333,7 +336,8 @@ var DatetimeSlot = React.createClass({
 
   openCalendar: function() {
     if (!this.state.open) {
-      this.setState({ open: true, currentView: this.props.viewMode, viewStartDate: this.state.selectedStartDate.clone(),
+      var format = this.state.inputFormat;
+      this.setState({ open: true, inputValue: this.state.selectedStartDate.format(format) + ' -- ' + this.state.selectedEndDate.format(format), viewStartDate: this.state.selectedStartDate.clone(),
         viewEndDate: this.state.selectedEndDate.clone() }, function() {
         this.props.onFocus();
       });
@@ -348,11 +352,11 @@ var DatetimeSlot = React.createClass({
   },
 
   handleClickOutside: function() {
-    // if ( this.props.input && this.state.open && !this.props.open ) {
-    // 	this.setState({ open: false }, function() {
-    // 		this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
-    // 	});
-    // }
+    if ( this.state.open && !this.props.open ) {
+    	this.setState({ open: false }, function() {
+    		this.props.onBlur( this.state.selectedStartDate || this.state.inputValue );
+    	});
+    }
   },
 
   localMoment: function( date, format, props ) {
@@ -483,7 +487,7 @@ var DatetimeSlot = React.createClass({
         DOM.span({ key: 'months', className: this.state.viewMode === 'months'? 'item item-selected':'item', onClick: function(event) {
           event.preventDefault();
           that.changeViewMode('months');
-        }}, 'Months'),
+        }}, 'Month'),
         DOM.span({ key: 'days', className: this.state.viewMode === 'days'? 'item item-selected':'item', onClick: function(event) {
           event.preventDefault();
           that.changeViewMode('days');
@@ -494,14 +498,14 @@ var DatetimeSlot = React.createClass({
         }}, 'Hour')),
       DOM.div({key: 'time-slot', className: 'time-slot'},DOM.div({key: 'left', className: 'left-time-container'},
         DOM.div({ key: 'dt', className: 'rdtPicker start-time' },
-          React.createElement( CalendarContainer, {view: this.state.currentStartView, viewProps: this.getComponentProps('start'), onClickOutside: this.handleClickOutside })),
+          React.createElement( CalendarContainer, {view: this.state.currentStartView, viewProps: this.getComponentProps('start')})),
         DOM.button({className: 'cancel-button', onClick: function(event) {
           event.preventDefault();
           that.closeCalendar();
         }}, 'CANCEL')),
         DOM.div({key: 'right', className: 'right-time-container'},
           DOM.div({ key: 'dt1', className: 'rdtPicker end-time' },
-            React.createElement( CalendarContainer, {view: this.state.currentEndView, viewProps: this.getComponentProps('end'), onClickOutside: this.handleClickOutside })),
+            React.createElement( CalendarContainer, {view: this.state.currentEndView, viewProps: this.getComponentProps('end')})),
           DOM.button({className: 'search-button', onClick: function(event) {
             event.preventDefault();
             that.props.searchByTime(that.state.selectedStartDate, that.state.selectedEndDate, that.state.viewMode);
@@ -509,8 +513,8 @@ var DatetimeSlot = React.createClass({
           }}, 'SEARCH'))
       ))
     ));
-  }
-});
+  },
+}));
 
 // Make moment accessible through the Datetime class fine
 DatetimeSlot.moment = moment;

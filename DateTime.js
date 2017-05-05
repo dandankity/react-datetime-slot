@@ -312,6 +312,12 @@ var DatetimeSlot = onClickOutside(React.createClass({
       }
 
       if (startOrEnd === 'start') {
+        if (date < this.props.startTimeLimitation) {
+          date = this.props.startTimeLimitation.clone();
+        }
+        if (date > this.props.endTimeLimitation) {
+          date = this.props.endTimeLimitation.clone();
+        }
         var endDate = date > this.state.selectedEndDate? date.clone(): this.state.selectedEndDate.clone();
         this.setState({
           selectedStartDate: date,
@@ -322,6 +328,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
           open: open
         });
       } else {
+        var date = date > this.props.endTimeLimitation? this.props.endTimeLimitation: date.clone();
         this.setState({
           selectedEndDate: date,
           viewEndDate: date.clone(),

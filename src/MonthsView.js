@@ -49,11 +49,13 @@ var DateTimeSlotPickerMonths = onClickOutside( React.createClass({
 
 			isDisabled = ( validDay === undefined );
 
-			if ( isDisabled )
-				classes += ' rdtDisabled';
-
-			if ( date && i === month && year === date.year() )
-				classes += ' rdtActive';
+			if ( date && i === month && year === date.year() ) {
+        classes += ' rdtActive';
+			} else {
+        if ( isDisabled ) {
+          classes += ' rdtDisabled';
+        }
+			}
 
 			props = {
 				key: i,

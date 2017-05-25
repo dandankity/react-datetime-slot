@@ -18,21 +18,21 @@
 
 .right-time-container {
   display: inline-block !important;
-  width: 250px !important;
 }
 
 .left-time-container {
   display: inline-block !important;
-  width: 250px !important;
 }
 .start-time {
   position: relative;
+  width: 250px !important;
   border: solid 1px #979797 !important;
-  margin-right: 9px;
+  margin-right: 9px !important;
 }
 
 .end-time {
   position: relative;
+  width: 250px !important;
   border: solid 1px #979797 !important;
 }
 
@@ -71,12 +71,19 @@
 }
 
 .select-item {
-  border-radius: 2px;
   background-color: #f0f4f6;
-  border: solid 1px #d5dce1;
-  width: 204px;
+  width: 203px;
   height: 30px;
+  border: solid 1px #d5dce1;
+  border-radius: 2px;
   margin-bottom: 11px;
+}
+
+.item:last-child {
+  border-right: none !important;
+}
+.item:first-child {
+  border-left: none !important;
 }
 
 .item-selected {
@@ -95,11 +102,10 @@
   text-align: center;
   color: #4d5764;
   vertical-align: middle;
-  line-height: 30px;
-  height: 30px;
+  line-height: 28px;
+  height: 28px;
   display: inline-block;
   cursor: pointer;
-
 }
 .disable-click {
   pointer-events: none;

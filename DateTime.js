@@ -114,8 +114,8 @@ var DatetimeSlot = onClickOutside(React.createClass({
   getFormats: function( props ) {
     var formats = {
       years: 'YYYY',
-      months: 'MM/YY',
-      days: 'DD/MM/YY',
+      months: 'YYYY/MM',
+      days: 'YYYY/MM/DD',
       time: props.dateFormat + ' ' + props.timeFormat
     };
 

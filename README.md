@@ -175,3 +175,4 @@ If you want to develop using the component inside a React application, we recomm
 ### [Changelog](CHANGELOG.md)
 
 ### [MIT Licensed](LICENSE)
+ 

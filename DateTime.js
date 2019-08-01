@@ -508,7 +508,7 @@ var DatetimeSlot = onClickOutside(React.createClass({
       className1 += ' rdtOpen';
     }
     var that = this;
-    return DOM.div({className: className}, children.concat(DOM.div( {className: className1},
+    return DOM.div({className: className}, children.concat(DOM.div( {key: className1, className: className1},
       DOM.div({key: 'select-item', className: 'select-item'},
         DOM.span({ key: 'years', className: this.state.viewMode === 'years'? 'item item-selected':'item', onClick: function(event) {
           event.preventDefault();
